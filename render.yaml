@@ -1,0 +1,51 @@
+services:
+  # =========================================================
+  # 1. Backend REST API Web Service
+  # =========================================================
+  - type: web
+    name: expenseflow-api
+    env: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        fromService:
+          type: static
+          name: expenseflow-web
+          property: url
+
+  # =========================================================
+  # 2. Frontend React Single Page Application (Static Site)
+  # =========================================================
+  - type: static
+    name: expenseflow-web
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: expenseflow-api
+          property: url
+          format: ${url}/api
