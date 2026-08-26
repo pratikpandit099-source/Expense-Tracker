@@ -13,8 +13,12 @@ export const createApp = (): Express => {
   // Trust proxy for secure cookies on Render / reverse proxies
   app.set('trust proxy', 1);
 
-  // Security headers
-  app.use(helmet());
+  // Security headers (configure cross-origin policies)
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    })
+  );
 
   // CORS configuration
   app.use(
@@ -22,20 +26,24 @@ export const createApp = (): Express => {
       origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps, curl, Postman)
         if (!origin) return callback(null, true);
-        
-        // Match exact CLIENT_URL or localhost in development
-        const allowedOrigins = [
-          env.CLIENT_URL,
-          'http://localhost:5173',
-          'http://localhost:3000',
-          'http://127.0.0.1:5173',
-        ];
-        
-        if (allowedOrigins.includes(origin) || env.NODE_ENV === 'development') {
+
+        const originClean = origin.replace(/\/+$/, '');
+        const clientUrlClean = (env.CLIENT_URL || '').replace(/\/+$/, '');
+
+        const isAllowed =
+          env.NODE_ENV === 'development' ||
+          originClean === clientUrlClean ||
+          originClean === 'http://localhost:5173' ||
+          originClean === 'http://localhost:3000' ||
+          originClean === 'http://127.0.0.1:5173' ||
+          originClean.endsWith('.vercel.app') ||
+          originClean.endsWith('.onrender.com');
+
+        if (isAllowed) {
           return callback(null, true);
         }
-        
-        return callback(new Error('Blocked by CORS policy'));
+
+        return callback(new Error(`CORS blocked for origin: ${origin}`));
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -48,7 +56,7 @@ export const createApp = (): Express => {
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
   app.use(cookieParser());
 
-  // Root health check endpoint (as specified in Section 13)
+  // Root health check endpoint
   app.get('/', (_req: Request, res: Response) => {
     res.status(200).json({
       success: true,

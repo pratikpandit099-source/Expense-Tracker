@@ -57,7 +57,11 @@ export const RegisterPage: React.FC = () => {
       await registerAuth(data.name, data.email, data.password, data.confirmPassword);
       navigate('/dashboard', { replace: true });
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Failed to create account. Please try again.';
+      const msg =
+        err.response?.data?.message ||
+        (err.message === 'Network Error'
+          ? 'Connecting to server... Free cloud instances take ~30-50 seconds to wake up on first request. Please wait a moment and try again.'
+          : err.message || 'Failed to create account. Please try again.');
       setServerError(msg);
       toast.error(msg);
     } finally {

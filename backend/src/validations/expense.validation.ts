@@ -54,7 +54,7 @@ export const expenseQuerySchema = z.object({
     .optional(),
   search: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1).optional(),
-  limit: z.coerce.number().int().min(1).max(100).default(10).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).default(10).optional(),
   sortBy: z.enum(['expenseDate', 'amount', 'category', 'createdAt']).default('expenseDate').optional(),
   sortOrder: z.enum(['asc', 'desc']).default('desc').optional(),
 });

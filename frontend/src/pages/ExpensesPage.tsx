@@ -57,23 +57,29 @@ export const ExpensesPage: React.FC = () => {
   const handleExportCSV = async () => {
     setIsExporting(true);
     try {
-      // Fetch all matching records without pagination limit for export
-      const params = new URLSearchParams();
-      if (filters.category) params.append('category', filters.category);
-      if (filters.from) params.append('from', filters.from);
-      if (filters.to) params.append('to', filters.to);
-      if (filters.search) params.append('search', filters.search);
-      params.append('limit', '1000'); // Export up to 1000 records
+      let exportItems: Expense[] = [];
 
-      const res = await api.get<ApiResponse<PaginatedExpenses>>(`/expenses?${params.toString()}`);
-      const exportItems = res.data.data.expenses;
+      try {
+        const params = new URLSearchParams();
+        if (filters.category) params.append('category', filters.category);
+        if (filters.from) params.append('from', filters.from);
+        if (filters.to) params.append('to', filters.to);
+        if (filters.search) params.append('search', filters.search);
+        params.append('limit', '100'); // Export matching items
 
-      if (exportItems.length === 0) {
-        toast.info('No expenses to export');
+        const res = await api.get<ApiResponse<PaginatedExpenses>>(`/expenses?${params.toString()}`);
+        exportItems = res.data.data.expenses;
+      } catch {
+        // Fallback to currently displayed expenses
+        exportItems = data?.expenses || [];
+      }
+
+      if (!exportItems || exportItems.length === 0) {
+        toast.info('No expenses available to export');
         return;
       }
 
-      // Build CSV Content
+      // Build CSV Content with UTF-8 BOM for Excel compatibility
       const headers = ['ID', 'Date', 'Category', 'Description', 'Amount (USD)', 'Currency'];
       const rows = exportItems.map((item) => [
         `"${item._id}"`,
@@ -81,10 +87,10 @@ export const ExpensesPage: React.FC = () => {
         `"${item.category}"`,
         `"${(item.description || '').replace(/"/g, '""')}"`,
         `"${centsToDollars(item.amount).toFixed(2)}"`,
-        `"${item.currency}"`,
+        `"${item.currency || 'USD'}"`,
       ]);
 
-      const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -93,10 +99,11 @@ export const ExpensesPage: React.FC = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
       toast.success(`Exported ${exportItems.length} expenses to CSV`);
     } catch (err: any) {
-      toast.error('Failed to export CSV');
+      toast.error(err.message || 'Failed to export CSV');
     } finally {
       setIsExporting(false);
     }
