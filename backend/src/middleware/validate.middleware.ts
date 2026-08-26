@@ -8,11 +8,11 @@ export const validateBody = (schema: ZodSchema) => {
       const parsed = await schema.parseAsync(req.body);
       req.body = parsed;
       next();
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const errors = error.errors.map((err) => ({
-          field: err.path.join('.'),
-          issue: err.message,
+    } catch (error: any) {
+      if (error instanceof ZodError || error?.errors) {
+        const errors = (error.errors || []).map((err: any) => ({
+          field: Array.isArray(err.path) ? err.path.join('.') : String(err.path || ''),
+          issue: err.message || 'Validation error',
         }));
         next(new AppError('Validation failed', 400, errors));
       } else {
@@ -28,11 +28,11 @@ export const validateQuery = (schema: ZodSchema) => {
       const parsed = await schema.parseAsync(req.query);
       req.query = parsed as any;
       next();
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const errors = error.errors.map((err) => ({
-          field: err.path.join('.'),
-          issue: err.message,
+    } catch (error: any) {
+      if (error instanceof ZodError || error?.errors) {
+        const errors = (error.errors || []).map((err: any) => ({
+          field: Array.isArray(err.path) ? err.path.join('.') : String(err.path || ''),
+          issue: err.message || 'Invalid parameter',
         }));
         next(new AppError('Invalid query parameters', 400, errors));
       } else {
