@@ -5,14 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amountInCents: number, currency: string = 'USD'): string {
-  const dollars = (amountInCents || 0) / 100;
-  return new Intl.NumberFormat('en-US', {
+export function formatCurrency(amountInCents: number, currency: string = 'INR'): string {
+  const amount = (amountInCents || 0) / 100;
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: currency || 'USD',
+    currency: currency || 'INR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(dollars);
+  }).format(amount);
 }
 
 export function centsToDollars(cents: number): number {
@@ -30,7 +30,7 @@ export function formatDate(dateInput: string | Date, formatType: 'full' | 'short
   if (isNaN(date.getTime())) return '';
 
   if (formatType === 'full') {
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('en-IN', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
@@ -39,13 +39,13 @@ export function formatDate(dateInput: string | Date, formatType: 'full' | 'short
   }
 
   if (formatType === 'monthYear') {
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('en-IN', {
       year: 'numeric',
       month: 'short',
     }).format(date);
   }
 
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('en-IN', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

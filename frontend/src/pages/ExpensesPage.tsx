@@ -80,7 +80,7 @@ export const ExpensesPage: React.FC = () => {
       }
 
       // Build CSV Content with UTF-8 BOM for Excel compatibility
-      const headers = ['ID', 'Date', 'Category', 'Description', 'Amount (USD)', 'Currency'];
+      const headers = ['ID', 'Date', 'Category', 'Description', 'Amount (INR)', 'Currency'];
       const rows = exportItems.map((item) => [
         `"${item._id}"`,
         `"${formatDate(item.expenseDate, 'short')}"`,

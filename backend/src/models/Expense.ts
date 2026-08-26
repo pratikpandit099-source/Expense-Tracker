@@ -43,7 +43,7 @@ const expenseSchema = new Schema<IExpenseDocument, IExpenseModel>(
     },
     currency: {
       type: String,
-      default: 'USD',
+      default: 'INR',
       uppercase: true,
       trim: true,
     },

@@ -19,7 +19,7 @@ export class ExpenseService {
       userId,
       category: input.category,
       amount: input.amount,
-      currency: input.currency || 'USD',
+      currency: input.currency || 'INR',
       expenseDate: input.expenseDate,
       description: input.description || '',
     });

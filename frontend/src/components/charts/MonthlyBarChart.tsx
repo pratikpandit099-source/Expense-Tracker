@@ -101,7 +101,7 @@ export const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({
               tickLine={false}
             />
             <YAxis
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `₹${v}`}
               tick={{ fill: '#94a3b8', fontSize: 11 }}
               axisLine={false}
               tickLine={false}

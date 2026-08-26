@@ -7,7 +7,7 @@ import { centsToDollars, dollarsToCents, formatISODateForInput } from '../../lib
 import { Button } from '../common/Button.js';
 import { Input } from '../common/Input.js';
 import { Select } from '../common/Select.js';
-import { DollarSign, Calendar, FileText } from 'lucide-react';
+import { IndianRupee, Calendar, FileText } from 'lucide-react';
 import { CategoryIcon } from '../common/CategoryIcon.js';
 
 const expenseFormSchema = z.object({
@@ -17,8 +17,8 @@ const expenseFormSchema = z.object({
   amount: z
     .coerce
     .number({ invalid_type_error: 'Please enter a valid amount' })
-    .positive('Amount must be greater than $0')
-    .max(1000000, 'Amount cannot exceed $1,000,000'),
+    .positive('Amount must be greater than ₹0')
+    .max(10000000, 'Amount cannot exceed ₹1,00,00,000'),
   expenseDate: z
     .string()
     .min(1, 'Please choose a date')
@@ -35,7 +35,7 @@ interface ExpenseFormProps {
   initialData?: Expense | null;
   onSubmit: (data: {
     category: ExpenseCategory;
-    amount: number; // in cents
+    amount: number; // in cents/paise
     expenseDate: string;
     description?: string;
   }) => Promise<void>;
@@ -98,12 +98,12 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
       {/* Amount Input */}
       <div>
         <Input
-          label="Amount (USD)"
+          label="Amount (₹ / Rs.)"
           type="number"
           step="0.01"
           placeholder="0.00"
           error={errors.amount?.message}
-          leftIcon={<DollarSign className="w-4 h-4" />}
+          leftIcon={<IndianRupee className="w-4 h-4" />}
           {...register('amount')}
         />
       </div>

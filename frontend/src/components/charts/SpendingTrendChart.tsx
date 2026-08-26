@@ -107,7 +107,7 @@ export const SpendingTrendChart: React.FC<SpendingTrendChartProps> = ({
               tickLine={false}
             />
             <YAxis
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `₹${v}`}
               tick={{ fill: '#94a3b8', fontSize: 11 }}
               axisLine={false}
               tickLine={false}
